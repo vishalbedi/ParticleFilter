@@ -19,12 +19,13 @@ class MapHelper:
         if y < 0 or y > self.img_height:
             return False
         intensity_point = self.img[x, y]
-        return intensity_point > 100
+        return intensity_point > 50
 
     def cast_pixel_ray_on_map(self, x, y, theta):
         """
         Sudo laser scanner for each particle
         Based on angle provided check till what point can ray be traced
+        Ray tracing because breshanham is too expensive
         :param x: x co-ordinate of particle in pixels
         :param y: y co-ordinate of particle in pixels
         :param theta: angle of particle in pixels
@@ -42,7 +43,6 @@ class MapHelper:
             # check if there is no obstacle within the ray traced
             if self.test_pixel_in_map(x + dx, y + dy):
                 return i / self.IMAGE_SCALE
-
         return self.LASER_MAX
 
     def get_image_height_pixels(self):

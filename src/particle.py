@@ -57,39 +57,20 @@ class Particle:
            None
 
         """
+        min_angle = scan_msg.angle_min
+        angle_increment = scan_msg.angle_increment
+        ranges = scan_msg.ranges
 
-        xs, ys = self._scan_to_endpoints(scan_msg)
-        total_prob = 0
-        for i in range(0, len(xs), 10):
-            likelihood = self.likelihood_field.get_cell(xs[i], ys[i])
-            if np.isnan(likelihood):
-                likelihood = 0
-            total_prob += np.log(self.laser_z_hit * likelihood +
-                                 self.laser_z_rand)
+        ray_probabilities = []
+        for idx, value in enumerate(ranges):
+            angle = min_angle + angle_increment * idx
+            particcle_based_scan = self.get_particle_laser_value(angle)
+            ray_probability = self._probability_desnsity(value, particcle_based_scan)
+            ray_probabilities.append(ray_probability)
+        self.weight *= sum(ray_probabilities)
 
-        self.weight *= np.exp(total_prob)
-
-    def _scan_to_endpoints(self, scan_msg):
-        """
-        Helper method used to convert convert range values into x, y
-        coordinates in the map coordinate frame.  Based on
-        probabilistic robotics equation 6.32
-
-        """
-        theta_beam = np.arange(scan_msg.angle_min, scan_msg.angle_max,
-                               scan_msg.angle_increment)
-        ranges = np.array(scan_msg.ranges)
-        xs = (self.x + ranges * np.cos(self.theta + theta_beam))
-        ys = (self.y + ranges * np.sin(self.theta + theta_beam))
-
-        # Clear out nan entries:
-        xs = xs[np.logical_not(np.isnan(xs))]
-        ys = ys[np.logical_not(np.isnan(ys))]
-
-        # Clear out inf entries:
-        xs = xs[np.logical_not(np.isinf(xs))]
-        ys = ys[np.logical_not(np.isinf(ys))]
-        return xs, ys
+    def normalize(self, total_weight):
+        self.weight = self.weight/total_weight
 
     def _probability_desnsity(self, _sensor, _particle):
         """
@@ -109,3 +90,9 @@ class Particle:
     def check_within_map(self, world_x, world_y, image_size_pixel):
         pixel_point = transformations.world_to_pixel([world_x, world_y], image_size_pixel)
         return self.map_helper.test_pixel_in_map(pixel_point[0], pixel_point[1])
+
+    def get_particle_laser_value(self, angle):
+        # convert particle world location to pixel location
+        pixel_points = transformations.world_to_pixel([self.x, self.y], self.map_helper.get_image_size_pixels())
+        pixel_theta = transformations.worldtheta_to_pixeltheta(self.theta)
+        return self.map_helper.cast_pixel_ray_on_map(pixel_points[0], pixel_points[1], pixel_theta)
