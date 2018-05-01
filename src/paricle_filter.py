@@ -4,7 +4,6 @@ import utils
 import numpy as np
 import transformations
 import random
-import rospy
 import map_helper
 
 class ParticleFilter:
@@ -17,13 +16,13 @@ class ParticleFilter:
         self.WORLD_MAP_HEIGHT = map_height
         self.image_path = image_path
         self.laser_max = 10
+        self.helper = map_helper.MapHelper(image_path, self.laser_max, pixels_per_meter)
         self.pixels_per_meter = pixels_per_meter
         self.particle_set = [self.generate_random_particle() for _ in range(self.PARTICLE_COUNT)]
         self.isLocalized = False
         self.isClustering = False
         self.CLUSTER_SIZE = 15
         self.NEIGHBOR_THRESHOLD = 0.2
-        self.helper = map_helper.MapHelper(image_path, self.laser_max, pixels_per_meter)
 
     def generate_random_particle(self):
         """
