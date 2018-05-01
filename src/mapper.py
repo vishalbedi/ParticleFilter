@@ -10,7 +10,7 @@
 '''
 
 import Tkinter as tk
-from PIL import Image
+from PIL import Image, ImageDraw
 import ImageTk
 import rospy
 from sensor_msgs.msg import LaserScan
@@ -32,13 +32,15 @@ class Mapper(tk.Frame):
         self.themap = Image.open(image_path)
         self.mapimage = ImageTk.PhotoImage(self.themap)
         (MAPWIDTH, MAPHEIGHT) = self.themap.size
+        rospy.loginfo((MAPWIDTH, MAPHEIGHT))
         self.master.minsize(width=MAPWIDTH, height=MAPWIDTH)
 
         # this gives us directly memory access to the image pixels:
         self.mappix = self.themap.load()
         # keeping the odds separately saves one step per cell update:
-        self.oddsvals = [[1.0 for _ in range(MAPWIDTH)] for _ in range(MAPHEIGHT)]
-        self.pf = paricle_filter.ParticleFilter(MAPWIDTH, MAPHEIGHT, image_path, 16)
+        WORLD_MAP_WIDTH = 125.0
+        WORLD_MAP_HEIGHT = 43.75
+        self.pf = paricle_filter.ParticleFilter(WORLD_MAP_WIDTH, WORLD_MAP_HEIGHT, image_path, 16)
         self.canvas = tk.Canvas(self, width=MAPWIDTH, height=MAPHEIGHT)
         self.laser_scan = []
         self.sonar_scan = []
@@ -55,9 +57,11 @@ class Mapper(tk.Frame):
 
     def map_update(self, points):
         # note this function just lowers the odds in a random area...
-
         for point in points:
-            self.mappix[point[0], point[1]] = 128
+            rospy.loginfo(point)
+            
+            draw = ImageDraw.Draw(self.themap)
+            draw.ellipse((point[0]-1, point[1]-1, point[0]+1, point[1]+1), fill=(255,0,0,255))
 
         # this puts the image update on the GUI thread, not ROS thread!
         # also note only one image update per scan, not per map-cell update
@@ -68,7 +72,7 @@ class Mapper(tk.Frame):
         particles = self.pf.particle_set
         particle_points = []
         for p in particles:
-            x, y = transformations.world_to_pixel(p.x, p.y)
+            x, y = transformations.world_to_pixel((p.x, p.y),(self.MAPHEIGHT,self.MAPWIDTH ) )
             particle_points.append([x, y])
         self.map_update(particle_points)
 

@@ -7,12 +7,12 @@ import transformations
 
 
 class Particle:
-    def __init__(self, x, y, theta, map_path, laser_max, image_scale):
+    def __init__(self, x, y, theta, map_path, laser_max, image_scale, helper):
         self.x = x
         self.y = y
         self.theta = theta
         self.weight = 1.0
-        self.map_helper = map_helper.MapHelper(map_path, laser_max, image_scale)
+        self.map_helper = helper
 
     def move(self, linear_dt, angular_dt, sigma):
         """

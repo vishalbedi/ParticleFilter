@@ -5,7 +5,7 @@ import numpy as np
 import transformations
 import random
 import rospy
-
+import map_helper
 
 class ParticleFilter:
     def __init__(self, map_width,  map_height, image_path, pixels_per_meter, num_of_particles=100, dt=0.1):
@@ -13,8 +13,8 @@ class ParticleFilter:
         self.NOISE = int(self.PARTICLE_COUNT * .10)
         self.dt = dt
         self.centroid = (0, 0, 0)
-        self.IMAGE_MAP_WIDTH = map_width
-        self.IMAGE_MAP_HEIGHT = map_height
+        self.WORLD_MAP_WIDTH = map_width
+        self.WORLD_MAP_HEIGHT = map_height
         self.image_path = image_path
         self.laser_max = 10
         self.pixels_per_meter = pixels_per_meter
@@ -23,14 +23,15 @@ class ParticleFilter:
         self.isClustering = False
         self.CLUSTER_SIZE = 15
         self.NEIGHBOR_THRESHOLD = 0.2
+        self.helper = map_helper.MapHelper(map_path, laser_max, image_scale)
 
     def generate_random_particle(self):
         """
         Generate a particle randomly within the bounds of map
         :return: a new particle instance
         """
-        x, y, theta = utils.generate_random_pose(self.IMAGE_MAP_WIDTH, self.IMAGE_MAP_HEIGHT)
-        return particle.Particle(x, y, theta, self.image_path, self.laser_max, self.pixels_per_meter)
+        x, y, theta = utils.generate_random_pose(self.WORLD_MAP_WIDTH, self.WORLD_MAP_HEIGHT)
+        return particle.Particle(x, y, theta, self.image_path, self.laser_max, self.pixels_per_meter, self.helper)
 
     def motion_sense(self, twist):
         """
@@ -96,7 +97,7 @@ class ParticleFilter:
                 p.weight = 1.0
 
     def filter(self, sensor_msg, twist):
-        self.laser_max = sensor_msg.laser_max
+        self.laser_max = sensor_msg.range_max
         # don't update if clustering
         if self.isClustering:
             return
@@ -153,8 +154,8 @@ class ParticleFilter:
             centroid = np.mean(cluster_coordinates, axis=0)
             variance = np.var(cluster_coordinates, axis=0)
             self.centroid = (centroid[0],centroid[1], biggest_cluster[random.randint(0,biggest_cluster_size-1)].theta)
-            rospy.loginfo("Centroid ")
-            rospy.loginfo(self.centroid)
+            #rospy.loginfo("Centroid ")
+            #rospy.loginfo(self.centroid)
 
             if biggest_cluster_size > self.PARTICLE_COUNT * .75:
                 self.isLocalized = True
