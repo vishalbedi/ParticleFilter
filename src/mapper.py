@@ -27,9 +27,9 @@ class Mapper(tk.Frame):
     def __init__(self, image_path, *args, **kwargs):
         tk.Frame.__init__(self, *args, **kwargs)
         self.master.title("I'm the map!")
-
+        self.baseImg = Image.open(image_path).convert("RGBA")
         # makes a grey-scale image filled with 50% grey pixels
-        self.themap = Image.open(image_path)
+        self.themap = Image.open(image_path).convert("RGBA")
         self.mapimage = ImageTk.PhotoImage(self.themap)
         (MAPWIDTH, MAPHEIGHT) = self.themap.size
         rospy.loginfo((MAPWIDTH, MAPHEIGHT))
@@ -54,12 +54,11 @@ class Mapper(tk.Frame):
     def update_image(self):
         self.mapimage = ImageTk.PhotoImage(self.themap)
         self.canvas.create_image(self.MAPWIDTH / 2, self.MAPHEIGHT / 2, image=self.mapimage)
+        self.themap = self.baseImg
 
     def map_update(self, points):
         # note this function just lowers the odds in a random area...
-        for point in points:
-            rospy.loginfo(point)
-            
+        for point in points:            
             draw = ImageDraw.Draw(self.themap)
             draw.ellipse((point[0]-1, point[1]-1, point[0]+1, point[1]+1), fill=(255,0,0,255))
 

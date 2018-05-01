@@ -25,10 +25,10 @@ def pixel_to_world(pixel_points, image_size):
     img_h, img_w = image_size
     pixel_x, pixel_y = pixel_points
     world_points = [0,0]
-    world_points[0] = pixel_x / img_w * WORLD_MAP_WIDTH
-    world_points[1] = (pixel_y / img_h * WORLD_MAP_HEIGHT)
+    world_points[0] = (pixel_x / img_w) * WORLD_MAP_WIDTH
+    world_points[1] = (pixel_y / img_h) * WORLD_MAP_HEIGHT
     world_points[0] = world_points[0] - WORLD_MAP_WIDTH / 2
-    world_points[1] = world_points[1] + WORLD_MAP_HEIGHT / 2
+    world_points[1] = WORLD_MAP_HEIGHT / 2 - world_points[1]
     return world_points
 
 
