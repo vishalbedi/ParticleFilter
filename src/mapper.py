@@ -78,18 +78,16 @@ class Mapper(tk.Frame):
 
 def main():
     rospy.init_node("mapper")
+    rospy.loginfo("started")
     root = tk.Tk()
     IMAGE_WIDTH = 2000
     IMAGE_HEIGHT = 700
-    m = Mapper(image_path="", master=root, height=IMAGE_HEIGHT, width=IMAGE_WIDTH)
-    rospy.Subscriber("/scan", LaserScan, m.laser_callback)
-    rospy.Subscriber("/pose", Odometry, m.odem_callback)
+    m = Mapper(image_path="/home/stu1/s6/vgb8777/catkin_ws/src/localization/map/map.png", master=root, height=IMAGE_HEIGHT, width=IMAGE_WIDTH)
+    rospy.Subscriber("/r1/kinect_laser/scan", LaserScan, m.laser_callback)
+    rospy.Subscriber("/r1/odom", Odometry, m.odem_callback)
     rospy.Timer(rospy.Duration(0.01), m.pf.clustering)
     rospy.Timer(rospy.Duration(0.2), root.mainloop())
 
 
 if __name__ == "__main__":
-    if not len(sys.argv) == 2:
-        rospy.loginfo('Usage : rosrun hw4 mapper.py <sensor-type>')
-    else:
-        main()
+    main()

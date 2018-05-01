@@ -4,6 +4,7 @@ import utils
 import numpy as np
 import transformations
 import random
+import rospy
 
 
 class ParticleFilter:
@@ -103,7 +104,7 @@ class ParticleFilter:
         self.resample()
         self.motion_sense(twist)
 
-    def clustering(self):
+    def clustering(self,event):
         """
         Perform K means clustering to get the centroid of the particles
         do not perform any update while clustering
@@ -112,7 +113,7 @@ class ParticleFilter:
         while True:
             self.isClustering = True
             particles = self.particle_set
-            particles = sorted(particles, key=lambda k: (k['x'], k['y'], k['theta']))
+            particles = sorted(particles, key=lambda k: (k.x, k.y, k.theta))
             visited = set()
             clusters = {}
             cluster_count = 0
@@ -126,7 +127,7 @@ class ParticleFilter:
                         current_particle_index = queue.pop()
                         current_particle = particles[current_particle_index]
                         clusters[cluster_count].append(current_particle)
-                        end_particle_index = current_particle + self.CLUSTER_SIZE
+                        end_particle_index = current_particle_index + self.CLUSTER_SIZE
                         if end_particle_index > self.PARTICLE_COUNT:
                             end_particle_index = self.PARTICLE_COUNT
                         cluster_distances = []
@@ -152,6 +153,8 @@ class ParticleFilter:
             centroid = np.mean(cluster_coordinates, axis=0)
             variance = np.var(cluster_coordinates, axis=0)
             self.centroid = (centroid[0],centroid[1], biggest_cluster[random.randint(0,biggest_cluster_size-1)].theta)
+            rospy.loginfo("Centroid ")
+            rospy.loginfo(self.centroid)
 
             if biggest_cluster_size > self.PARTICLE_COUNT * .75:
                 self.isLocalized = True
