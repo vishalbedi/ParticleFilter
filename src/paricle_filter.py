@@ -6,6 +6,7 @@ import transformations
 import random
 import map_helper
 
+
 class ParticleFilter:
     def __init__(self, map_width,  map_height, image_path, pixels_per_meter, num_of_particles=100, dt=0.1):
         self.PARTICLE_COUNT = num_of_particles
@@ -23,6 +24,7 @@ class ParticleFilter:
         self.isClustering = False
         self.CLUSTER_SIZE = 15
         self.NEIGHBOR_THRESHOLD = 0.2
+        self.unreachable_points_set = set()
 
     def generate_random_particle(self):
         """
@@ -30,7 +32,10 @@ class ParticleFilter:
         :return: a new particle instance
         """
         x, y, theta = utils.generate_random_pose(self.WORLD_MAP_WIDTH, self.WORLD_MAP_HEIGHT)
-        return particle.Particle(x, y, theta, self.image_path, self.laser_max, self.pixels_per_meter, self.helper)
+        if self.check_within_map(x, y, self.helper.get_image_size_pixels()):
+            return particle.Particle(x, y, theta, self.helper)
+        else:
+            return self.generate_random_particle()
 
     def motion_sense(self, twist):
         """
@@ -161,3 +166,7 @@ class ParticleFilter:
             else:
                 self.isLocalized = False
             self.isClustering = False
+
+    def check_within_map(self, world_x, world_y, image_size_pixel):
+        pixel_point = transformations.world_to_pixel([world_x, world_y], image_size_pixel)
+        return self.helper.test_pixel_in_map(pixel_point[0], pixel_point[1])

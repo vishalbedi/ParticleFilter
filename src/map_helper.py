@@ -52,10 +52,10 @@ class MapHelper:
         return self.img_width
 
     def get_image_height_world(self):
-        return self.img_height * self.IMAGE_SCALE
+        return self.img_height / self.IMAGE_SCALE
 
     def get_image_width_world(self):
-        return self.img_width * self.IMAGE_SCALE
+        return self.img_width / self.IMAGE_SCALE
 
     def get_image_size_pixels(self):
         return self.img.shape[:2]

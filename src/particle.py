@@ -1,13 +1,11 @@
 import random
-import numpy as np
 from math import cos, sin, sqrt, pi, e
-import map_helper
 import utils
 import transformations
 
 
 class Particle:
-    def __init__(self, x, y, theta, map_path, laser_max, image_scale, helper):
+    def __init__(self, x, y, theta, helper):
         self.x = x
         self.y = y
         self.theta = theta
@@ -64,13 +62,13 @@ class Particle:
         ray_probabilities = []
         for idx, value in enumerate(ranges):
             angle = min_angle + angle_increment * idx
-            particcle_based_scan = self.get_particle_laser_value(angle)
-            ray_probability = self._probability_desnsity(value, particcle_based_scan)
+            particle_based_scan = self.get_particle_laser_value(angle)
+            ray_probability = self._probability_desnsity(value, particle_based_scan)
             ray_probabilities.append(ray_probability)
         self.weight *= sum(ray_probabilities)
 
     def normalize(self, total_weight):
-        self.weight = self.weight/total_weight
+        self.weight /= total_weight
 
     def _probability_desnsity(self, _sensor, _particle):
         """
