@@ -9,10 +9,10 @@ def world_to_pixel(world_points, image_size):
     world_x, world_y = world_points
     img_h, img_w = image_size
     pixel_points = [0,0]
-    pixel_points[0] = int(max(abs(world_x / WORLD_MAP_WIDTH) * img_w, 0)) * (world_x/abs(world_x))
+    pixel_points[0] = int((max(abs(world_x / WORLD_MAP_WIDTH) * img_w, 0)) * (world_x/abs(world_x)))
     if pixel_points[0] > img_w - 1:
         pixel_points[0] = img_w - 1
-    pixel_points[1] = int(max(abs(world_y / WORLD_MAP_HEIGHT) * img_h, 0)) * (world_y/abs(world_y))
+    pixel_points[1] = int((max(abs(world_y / WORLD_MAP_HEIGHT) * img_h, 0)) * (world_y/abs(world_y)))
     if pixel_points[1] > img_h - 1:
         pixel_points[1] = img_h
     pixel_points[1] = pixel_points[1]

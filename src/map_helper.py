@@ -18,7 +18,7 @@ class MapHelper:
             return False
         if y < 0 or y > self.img_height:
             return False
-        intensity_point = self.img[x, y]
+        intensity_point = self.img[y, x]
         return intensity_point > 50
 
     def cast_pixel_ray_on_map(self, x, y, theta):

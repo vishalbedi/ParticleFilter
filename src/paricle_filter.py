@@ -33,6 +33,7 @@ class ParticleFilter:
         :return: a new particle instance
         """
         x, y, theta = utils.generate_random_pose(self.WORLD_MAP_WIDTH, self.WORLD_MAP_HEIGHT)
+        rospy.loginfo((x,y))
         if self.check_within_map(x, y, self.helper.get_image_size_pixels()):
             return particle.Particle(x, y, theta, self.helper)
         else:
@@ -171,4 +172,5 @@ class ParticleFilter:
 
     def check_within_map(self, world_x, world_y, image_size_pixel):
         pixel_point = transformations.world_to_pixel([world_x, world_y], image_size_pixel)
+        rospy.loginfo(pixel_point)
         return self.helper.test_pixel_in_map(pixel_point[0], pixel_point[1])

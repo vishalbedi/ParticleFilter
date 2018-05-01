@@ -32,7 +32,6 @@ class Mapper(tk.Frame):
         self.themap = Image.open(image_path).convert("RGBA")
         self.mapimage = ImageTk.PhotoImage(self.themap)
         (MAPWIDTH, MAPHEIGHT) = self.themap.size
-        rospy.loginfo((MAPWIDTH, MAPHEIGHT))
         self.master.minsize(width=MAPWIDTH, height=MAPWIDTH)
 
         # this gives us directly memory access to the image pixels:
