@@ -23,7 +23,7 @@ class ParticleFilter:
         self.isClustering = False
         self.CLUSTER_SIZE = 15
         self.NEIGHBOR_THRESHOLD = 0.2
-        self.helper = map_helper.MapHelper(map_path, laser_max, image_scale)
+        self.helper = map_helper.MapHelper(image_path, self.laser_max, pixels_per_meter)
 
     def generate_random_particle(self):
         """
