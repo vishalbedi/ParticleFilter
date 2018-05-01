@@ -1,4 +1,4 @@
-from math import sqrt, pi, e
+from math import sqrt
 import particle
 import utils
 import numpy as np
@@ -7,15 +7,15 @@ import random
 
 
 class ParticleFilter:
-    def __init__(self, map_width,  map_height, image_path, laser_max, pixels_per_meter, num_of_particles=100, dt=0.1):
+    def __init__(self, map_width,  map_height, image_path, pixels_per_meter, num_of_particles=100, dt=0.1):
         self.PARTICLE_COUNT = num_of_particles
         self.NOISE = int(self.PARTICLE_COUNT * .10)
         self.dt = dt
         self.centroid = (0, 0, 0)
-        self.MAP_WIDTH = map_width
-        self.MAP_HEIGHT = map_height
+        self.IMAGE_MAP_WIDTH = map_width
+        self.IMAGE_MAP_HEIGHT = map_height
         self.image_path = image_path
-        self.laser_max = laser_max
+        self.laser_max = 10
         self.pixels_per_meter = pixels_per_meter
         self.particle_set = [self.generate_random_particle() for _ in range(self.PARTICLE_COUNT)]
         self.isLocalized = False
@@ -28,7 +28,7 @@ class ParticleFilter:
         Generate a particle randomly within the bounds of map
         :return: a new particle instance
         """
-        x, y, theta = utils.generate_random_pose(self.MAP_WIDTH, self.MAP_HEIGHT)
+        x, y, theta = utils.generate_random_pose(self.IMAGE_MAP_WIDTH, self.IMAGE_MAP_HEIGHT)
         return particle.Particle(x, y, theta, self.image_path, self.laser_max, self.pixels_per_meter)
 
     def motion_sense(self, twist):
@@ -95,6 +95,7 @@ class ParticleFilter:
                 p.weight = 1.0
 
     def filter(self, sensor_msg, twist):
+        self.laser_max = sensor_msg.laser_max
         # don't update if clustering
         if self.isClustering:
             return
