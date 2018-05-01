@@ -4,6 +4,7 @@ import utils
 import numpy as np
 import transformations
 import random
+import rospy
 import map_helper
 
 
@@ -159,12 +160,13 @@ class ParticleFilter:
             variance = np.var(cluster_coordinates, axis=0)
             self.centroid = (centroid[0],centroid[1], biggest_cluster[random.randint(0,biggest_cluster_size-1)].theta)
             #rospy.loginfo("Centroid ")
-            #rospy.loginfo(self.centroid)
+            
 
             if biggest_cluster_size > self.PARTICLE_COUNT * .75:
                 self.isLocalized = True
             else:
                 self.isLocalized = False
+            rospy.loginfo(self.isLocalized)
             self.isClustering = False
 
     def check_within_map(self, world_x, world_y, image_size_pixel):
