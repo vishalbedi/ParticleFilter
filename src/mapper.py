@@ -51,8 +51,7 @@ class Mapper(tk.Frame):
         self.odem_msg = Odometry()
         self.MAPHEIGHT = MAPHEIGHT
         self.MAPWIDTH = MAPWIDTH
-        self.wanderer = safewander.SafeWander()
-        self.wanderer.travel(self._get_wanderer_coordinates())
+        self.wanderer = safewander.SafeWander(self._get_wanderer_coordinates())
         self.pathplanner = None
 
     def _get_wanderer_coordinates(self):
@@ -64,8 +63,8 @@ class Mapper(tk.Frame):
             coordinates.append(p)
         return coordinates
 
-    def set_goal(self,x,y,theta):
-        self.goal = [x,y,theta]
+    def set_goal(self, x, y, theta):
+        self.goal = [x, y, theta]
 
     def update_image(self):
         rospy.loginfo("plotting points")
@@ -75,9 +74,9 @@ class Mapper(tk.Frame):
 
     def map_update(self, points):
         # note this function just lowers the odds in a random area...
-        for point in points:            
+        for point in points:
             draw = ImageDraw.Draw(self.themap)
-            draw.ellipse((point[0]-1, point[1]-1, point[0]+1, point[1]+1), fill=(255,0,0,255))
+            draw.ellipse((point[0] - 1, point[1] - 1, point[0] + 1, point[1] + 1), fill=(255, 0, 0, 255))
         # this puts the image update on the GUI thread, not ROS thread!
         # also note only one image update per scan, not per map-cell update
         self.after(0, self.update_image)
@@ -93,7 +92,7 @@ class Mapper(tk.Frame):
             particle_points.append([x, y])
         if self.pf.isLocalized:
             start = Node(self.pf.centroid[0], self.pf.centroid[1], self.pf.centroid[2])
-            end = Node(self.goal[0], self.goal[1],self.goal[2])
+            end = Node(self.goal[0], self.goal[1], self.goal[2])
             self.pathplanner = astar.PathPlanner(start, pi, end)
             self.pathplanner.plan()
         self.map_update(particle_points)
@@ -103,14 +102,15 @@ class Mapper(tk.Frame):
         self.odem_msg = msg
 
 
-def main(x,y,theta):
+def main(x, y, theta):
     rospy.init_node("mapper")
     rospy.loginfo("started")
     rospy.Rate(10)
     root = tk.Tk()
     IMAGE_WIDTH = 2000
     IMAGE_HEIGHT = 700
-    m = Mapper(image_path="/home/stu1/s6/vgb8777/catkin_ws/src/localization/map/map.png", master=root, height=IMAGE_HEIGHT, width=IMAGE_WIDTH)
+    m = Mapper(image_path="/home/stu1/s6/vgb8777/catkin_ws/src/localization/map/map.png", master=root,
+               height=IMAGE_HEIGHT, width=IMAGE_WIDTH)
     m.set_goal(x, y, theta)
     rospy.Subscriber('/r1/odom', Odometry, m.wanderer.odom_callback)
     rospy.Subscriber('/r1/kinect_laser/scan', LaserScan, m.wanderer.laser_callback)
@@ -118,6 +118,7 @@ def main(x,y,theta):
     rospy.Subscriber("/r1/kinect_laser/scan", LaserScan, m.laser_callback)
     rospy.Subscriber("/r1/odom", Odometry, m.odem_callback)
     rospy.Timer(rospy.Duration(0.01), m.pf.clustering)
+    rospy.Timer(rospy.Duration(0.1), m.wanderer.travel)
     rospy.Timer(rospy.Duration(0.2), root.mainloop())
 
 

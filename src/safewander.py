@@ -17,7 +17,7 @@ EXIT_STATUS_OK = 0
 
 
 class SafeWander:
-    def __init__(self):
+    def __init__(self, goals):
         # rospy.init_node('traveler', anonymous=True)
         self.vel_publisher = rospy.Publisher('/r1/cmd_vel', Twist, queue_size=10)
         # Hold position and quaternion of robot
@@ -33,6 +33,7 @@ class SafeWander:
         self.vel_msg = Twist()
         self.rate = rospy.Rate(10)
         self.islocalized = False
+        self.goals = goals
 
     def odom_callback(self, odom):  # will continuously update current position
         """
@@ -162,6 +163,7 @@ class SafeWander:
                                          ANGULAR_VELOCITY * self.angular_difference())
             # publish velocity
             self.vel_publisher.publish(self.vel_msg)
+            rospy.sleep(0.01)
             self.rate.sleep()
 
         if self.obstacle_found:
@@ -171,8 +173,8 @@ class SafeWander:
             self.stop()
             self.start = self.goal
 
-    def travel(self, goals):
-        for goal in goals:
+    def travel(self, event):
+        for goal in self.goals:
             self.start = (self.pos.position.x, self.pos.position.y)
             self.mline = self.slope(self.start, goal)
             self.goal = goal
@@ -189,5 +191,5 @@ if __name__ == '__main__':
         p = (x, y)
         coordinates.append(p)
 
-    Robot = SafeWander()
-    Robot.travel(coordinates)
+    Robot = SafeWander(coordinates)
+    Robot.travel()
