@@ -75,9 +75,12 @@ class SafeWander:
         @arg 	p2 	second point of line segment
         @returns 	slope of line segment
         """
-        delta_y = p2[1] - p1[1]
-        delta_x = p2[0] - p1[0]
-        return delta_y / delta_x if delta_x != 0 else float('inf')
+        try:
+            delta_y = p2[1] - p1[1]
+            delta_x = p2[0] - p1[0]
+            return delta_y / delta_x if delta_x != 0 else float('inf')
+        except:
+            return 1
 
     def euclidean_distance(self):
         """
