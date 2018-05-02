@@ -61,6 +61,8 @@ class Particle:
 
         ray_probabilities = []
         for idx, value in enumerate(ranges):
+            if idx % 10 != 0:
+                continue
             angle = min_angle + angle_increment * idx
             particle_based_scan = self.get_particle_laser_value(angle)
             ray_probability = self._probability_desnsity(value, particle_based_scan)

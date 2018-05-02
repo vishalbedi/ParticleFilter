@@ -35,7 +35,6 @@ class ParticleFilter:
         rospy.loginfo("Generating particles")
         x, y, theta = utils.generate_random_pose(self.WORLD_MAP_WIDTH, self.WORLD_MAP_HEIGHT)
         return particle.Particle(x, y, theta, self.helper)
-        
 
     def motion_sense(self, twist):
         """
