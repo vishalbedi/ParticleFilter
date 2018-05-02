@@ -46,6 +46,8 @@ class ParticleFilter:
         :param twist: current angular and linear velocity
         :return: new particle set with motion applied
         """
+        if self.isClustering:
+            return
         rospy.loginfo("Motion Sense")
         linear_vel = twist.twist.linear.x
         angular_vel = twist.twist.angular.z
@@ -58,6 +60,8 @@ class ParticleFilter:
             p.move(linear_vel_dt, angular_vel_dt, sigma)
 
     def sensor_scan(self, msg_scan):
+        if self.isClustering:
+            return
         for p in self.particle_set:
             p.sense(msg_scan)
 
@@ -92,6 +96,8 @@ class ParticleFilter:
         Calculate the variance of weights and resample if the variance is less than 80% of total particles
         :return:
         """
+        if self.isClustering:
+            return
         rospy.loginfo("Resample")
         sum_of_weight_squares = sum([p.weight**2 for p in self.particle_set])
         variance_in_weights = 1.0/sum_of_weight_squares
@@ -111,7 +117,7 @@ class ParticleFilter:
         self.resample()
         self.motion_sense(twist)
 
-    def clustering(self,event):
+    def clustering(self, event):
         """
         Perform K means clustering to get the centroid of the particles
         do not perform any update while clustering
@@ -129,7 +135,7 @@ class ParticleFilter:
             for i in range(self.PARTICLE_COUNT):
                 if i not in visited:
                     queue = [i]
-                    cluster_count +=1
+                    cluster_count += 1
                     clusters[cluster_count] = []
                     while len(queue):
                         current_particle_index = queue.pop()
