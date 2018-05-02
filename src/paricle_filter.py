@@ -26,6 +26,7 @@ class ParticleFilter:
         self.CLUSTER_SIZE = 15
         self.NEIGHBOR_THRESHOLD = 0.2
         self.unreachable_points_set = set()
+        self.focus_points = [(8,-0.5), (-12.0, 12.0), (-18.4,-8.9), (10.8,12.7),(-54.5,7.6), (8,-1.5)]
 
     def generate_random_particle(self):
         """
