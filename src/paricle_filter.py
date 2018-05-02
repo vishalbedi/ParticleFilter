@@ -32,12 +32,10 @@ class ParticleFilter:
         Generate a particle randomly within the bounds of map
         :return: a new particle instance
         """
+        rospy.loginfo("Generating particles")
         x, y, theta = utils.generate_random_pose(self.WORLD_MAP_WIDTH, self.WORLD_MAP_HEIGHT)
-        rospy.loginfo((x,y))
-        if self.check_within_map(x, y, self.helper.get_image_size_pixels()):
-            return particle.Particle(x, y, theta, self.helper)
-        else:
-            return self.generate_random_particle()
+        return particle.Particle(x, y, theta, self.helper)
+        
 
     def motion_sense(self, twist):
         """
@@ -48,14 +46,16 @@ class ParticleFilter:
         :param twist: current angular and linear velocity
         :return: new particle set with motion applied
         """
-        linear_vel = twist.linear.x
-        angular_vel = twist.angular.z
+        rospy.loginfo("Motion Sense")
+        linear_vel = twist.twist.linear.x
+        angular_vel = twist.twist.angular.z
 
         linear_vel_dt = linear_vel * self.dt
         angular_vel_dt = angular_vel * self.dt
         sigma = (sqrt(linear_vel ** 2 + angular_vel ** 2) / 4.0) * self.dt
         # move every particle by motion that happens in time dt
-        self.particle_set = [p.move(linear_vel_dt, angular_vel_dt, sigma) for p in self.particle_set]
+        for p in self.particle_set:
+            p.move(linear_vel_dt, angular_vel_dt, sigma)
 
     def sensor_scan(self, msg_scan):
         for p in self.particle_set:
@@ -85,7 +85,6 @@ class ParticleFilter:
                 else:
                     idxs.append(i)
                     break
-
         return map(lambda ii: particles[ii], idxs)
 
     def resample(self):
@@ -93,6 +92,7 @@ class ParticleFilter:
         Calculate the variance of weights and resample if the variance is less than 80% of total particles
         :return:
         """
+        rospy.loginfo("Resample")
         sum_of_weight_squares = sum([p.weight**2 for p in self.particle_set])
         variance_in_weights = 1.0/sum_of_weight_squares
         # select particles randomly from the current particle set
@@ -117,6 +117,7 @@ class ParticleFilter:
         do not perform any update while clustering
         :return:
         """
+        rospy.loginfo("Clustering")
         while True:
             self.isClustering = True
             particles = self.particle_set
@@ -161,14 +162,13 @@ class ParticleFilter:
             variance = np.var(cluster_coordinates, axis=0)
             self.centroid = (centroid[0],centroid[1], biggest_cluster[random.randint(0,biggest_cluster_size-1)].theta)
             #rospy.loginfo("Centroid ")
-            
-
             if biggest_cluster_size > self.PARTICLE_COUNT * .75:
                 self.isLocalized = True
             else:
                 self.isLocalized = False
-            rospy.loginfo(self.isLocalized)
+            
             self.isClustering = False
+            rospy.sleep(0.1)
 
     def check_within_map(self, world_x, world_y, image_size_pixel):
         pixel_point = transformations.world_to_pixel([world_x, world_y], image_size_pixel)

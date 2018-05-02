@@ -14,9 +14,9 @@ class MapHelper:
             test if the pixel lies withn the image and return true if
             if the pixel is not toucing any obstacle
         """
-        if x < 0 or x > self.img_width:
+        if x < 0 or x >= self.img_width:
             return False
-        if y < 0 or y > self.img_height:
+        if y < 0 or y >= self.img_height:
             return False
         intensity_point = self.img[y, x]
         return intensity_point > 50
@@ -38,8 +38,8 @@ class MapHelper:
         max_laser_dist_in_pixels = int(floor(self.LASER_MAX * self.IMAGE_SCALE)) - 1
 
         for i in range(max_laser_dist_in_pixels):
-            dx = floor(i * ray_cos)
-            dy = floor(i * ray_sin)
+            dx = int(floor(i * ray_cos))
+            dy = int(floor(i * ray_sin))
             # check if there is no obstacle within the ray traced
             if self.test_pixel_in_map(x + dx, y + dy):
                 return i / self.IMAGE_SCALE
@@ -52,10 +52,10 @@ class MapHelper:
         return self.img_width
 
     def get_image_height_world(self):
-        return self.img_height / self.IMAGE_SCALE
+        return self.img_height / float(self.IMAGE_SCALE)
 
     def get_image_width_world(self):
-        return self.img_width / self.IMAGE_SCALE
+        return self.img_width / float(self.IMAGE_SCALE)
 
     def get_image_size_pixels(self):
         return self.img.shape[:2]

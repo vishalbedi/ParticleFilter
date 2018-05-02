@@ -14,7 +14,7 @@ def world_to_pixel(world_points, image_size):
         pixel_points[0] = img_w - 1
     pixel_points[1] = int((max(abs(world_y / WORLD_MAP_HEIGHT) * img_h, 0)) * (world_y/abs(world_y)))
     if pixel_points[1] > img_h - 1:
-        pixel_points[1] = img_h
+        pixel_points[1] = img_h - 1
     pixel_points[1] = pixel_points[1]
     pixel_points[0] = img_w/2 + pixel_points[0]
     pixel_points[1] = img_h/2 - pixel_points[1]
