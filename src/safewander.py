@@ -18,7 +18,7 @@ EXIT_STATUS_OK = 0
 
 class SafeWander:
     def __init__(self):
-        rospy.init_node('traveler', anonymous=True)
+        # rospy.init_node('traveler', anonymous=True)
         self.vel_publisher = rospy.Publisher('/r1/cmd_vel', Twist, queue_size=10)
         # Hold position and quaternion of robot
         self.pos = Pose()

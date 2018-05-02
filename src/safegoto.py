@@ -18,7 +18,7 @@ EXIT_STATUS_OK = 0
 
 class SafeGoTo:
     def __init__(self):
-        rospy.init_node('traveler', anonymous=True)
+        # rospy.init_node('traveler', anonymous=True)
         self.vel_publisher = rospy.Publisher('/r1/cmd_vel', Twist, queue_size=10)
         self.odom_subscriber = rospy.Subscriber('/r1/odom', Odometry, self.odom_callback)
         self.laser_subscriber = rospy.Subscriber('/r1/kinect_laser/scan', LaserScan, self.laser_callback)
