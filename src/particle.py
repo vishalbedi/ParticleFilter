@@ -37,7 +37,7 @@ class Particle:
             self.y = y
             self.theta = theta
         else:
-            self.x, self.y, self.theta = utils.generate_random_pose(self.map_helper.get_image_width_world(), self.map_helper.get_image_height_world())
+            self.x, self.y, self.theta = utils.generate_random_pose()
 
     def sense(self, scan_msg):
         """Update the weight of this particle based on a LaserScan message.
