@@ -9,3 +9,5 @@ def generate_random_pose(MAP_WIDTH, MAP_HEIGHT):
     return x, y, theta
 
 
+def radians(degree):
+    return degree * pi / 180
